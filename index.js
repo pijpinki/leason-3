@@ -1,26 +1,38 @@
 const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+const maps = require('./controllers/maps');
+const weather = require('./controllers/weather');
+const tests = require('./tests');
 const config = require('./config');
-const { OpenWeather } = require('./services/OpenWeather');
-const { OpenMaps } = require('./services/OpenMaps');
-
 const app = express();
-const openWeather = new OpenWeather();
-const openMaps = new OpenMaps();
+
+app.use(express.urlencoded());
+app.use(express.json());
+
+app.use(morgan('dev'));
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', '*');
-  res.setHeader('Access-Control-Allow-Headers', '*');
-  res.setHeader('Content-type', 'application/json');
+  console.log(req.method, req.url);
+  next();
+});
+app.use(cors());
+
+app.use('/static', express.static('public'));
+
+app.use('/maps', maps);
+app.use('/weather', weather);
+
+
+app.get('/', (req, res) => {
+  res.send('hello');
+});
+
+app.use('/tests', tests);
+
+app.use((err, req, res, next) => {
+  err && console.log(err);
   next();
 });
 
-app.get('/weather', async (req, res) => {
-  res.send(await openWeather.getWeatherForLoc(req.query));
-});
-
-app.get('/city', async (req, res) => {
-  res.send(await openMaps.getCity(req.query.name));
-});
-
-app.listen(config.port);
+app.listen(config.port, err => err ? console.error(err) : console.log('Server started'));

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>hello work 1</h1>
+
+<script>
+  function main() {
+    fetch('http://localhost:3002/maps?city=irpin')
+      .then(res => res.json())
+      .then(console.log)
+      .catch(console.error);
+  }
+
+  main();
+</script>
+</body>
+</html>
